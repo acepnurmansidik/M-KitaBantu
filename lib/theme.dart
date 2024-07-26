@@ -10,10 +10,6 @@ TextStyle primaryTextStyle =
     TextStyle(fontFamily: "Inter", color: kPrimaryColor);
 TextStyle greyTextStyle = TextStyle(fontFamily: "Inter", color: kGreyColor);
 TextStyle blackTextStyle = TextStyle(fontFamily: "Inter", color: kBlackColor);
+TextStyle whiteTextStyle = TextStyle(fontFamily: "Inter", color: kWhitekColor);
 
-FontWeight light = FontWeight.w300;
-FontWeight regular = FontWeight.w400;
-FontWeight medium = FontWeight.w500;
-FontWeight semibold = FontWeight.w600;
-FontWeight bold = FontWeight.w700;
-FontWeight extraBold = FontWeight.w800;
+double defaultPadding = 20;

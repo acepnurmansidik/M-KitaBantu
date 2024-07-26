@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:kitabantu/theme.dart';
 
@@ -6,6 +8,10 @@ class SplashScreenPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Timer(const Duration(seconds: 3), () {
+      Navigator.pushNamedAndRemoveUntil(
+          context, '/get-started', (route) => false);
+    });
     return Scaffold(
       body: Center(
         child: Column(
@@ -26,7 +32,7 @@ class SplashScreenPage extends StatelessWidget {
               "Kita Bantu",
               style: primaryTextStyle.copyWith(
                 fontSize: 18,
-                fontWeight: bold,
+                fontWeight: FontWeight.w900,
               ),
             )
           ],
