@@ -77,8 +77,11 @@ class _GetStartedPageState extends State<GetStartedPage> {
                             side: BorderSide(color: kPrimaryColor),
                           ),
                           onPressed: () {
-                            controllerCarousel
-                                .animateToPage(onboardingItems.length - 1);
+                            controllerCarousel.animateToPage(
+                              onboardingItems.length - 1,
+                              duration: const Duration(seconds: 1),
+                              curve: Curves.easeInOut,
+                            );
                           },
                           child: Text(
                             'Skip',
