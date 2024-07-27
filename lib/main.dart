@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kitabantu/pages/get_startred_page.dart';
+import 'package:kitabantu/pages/main_page.dart';
 import 'package:kitabantu/pages/splash_page.dart';
 
 void main() {
@@ -16,6 +17,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const SplashScreenPage(),
         '/get-started': (context) => const GetStartedPage(),
+        '/main': (context) => const MainPage(),
       },
     );
   }

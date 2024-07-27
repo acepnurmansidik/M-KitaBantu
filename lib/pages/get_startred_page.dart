@@ -99,8 +99,12 @@ class _GetStartedPageState extends State<GetStartedPage> {
                             margin: const EdgeInsets.only(bottom: 33),
                             child: TextButton(
                               style: TextButton.styleFrom(
-                                  backgroundColor: kPrimaryColor),
-                              onPressed: () {},
+                                backgroundColor: kPrimaryColor,
+                              ),
+                              onPressed: () {
+                                Navigator.pushNamedAndRemoveUntil(
+                                    context, '/main', (route) => false);
+                              },
                               child: Text(
                                 'Get Started',
                                 style: whiteTextStyle.copyWith(
