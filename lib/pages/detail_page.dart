@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kitabantu/theme.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -77,7 +78,8 @@ class _DetailPageState extends State<DetailPage> {
                   width: 3,
                 ),
                 Text(
-                  '$total',
+                  NumberFormat.currency(symbol: "", decimalDigits: 0)
+                      .format(total),
                   style: blackTextStyle.copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -184,7 +186,8 @@ class _DetailPageState extends State<DetailPage> {
                     Container(
                       margin: const EdgeInsets.only(top: 5),
                       child: Text(
-                        'Rp. 20.000.000',
+                        NumberFormat.currency(symbol: "Rp. ", decimalDigits: 0)
+                            .format(20000000),
                         style: primaryTextStyle.copyWith(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
@@ -202,7 +205,9 @@ class _DetailPageState extends State<DetailPage> {
                           ),
                           children: [
                             TextSpan(
-                              text: 'Rp. 2.000.000',
+                              text: NumberFormat.currency(
+                                      symbol: "Rp. ", decimalDigits: 0)
+                                  .format(200000),
                               style: blackTextStyle.copyWith(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w800,
@@ -502,7 +507,9 @@ class _DetailPageState extends State<DetailPage> {
                       style: blackTextStyle.copyWith(fontSize: 14),
                       children: [
                         TextSpan(
-                          text: 'Rp. $amount',
+                          text: NumberFormat.currency(
+                                  symbol: "Rp. ", decimalDigits: 0)
+                              .format(amount),
                           style: blackTextStyle.copyWith(
                             fontSize: 14,
                             fontWeight: FontWeight.w800,
