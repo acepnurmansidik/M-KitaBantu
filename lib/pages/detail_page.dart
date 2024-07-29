@@ -10,9 +10,55 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   double heightScroll = 0;
+  double _scrollOffset = 0.2;
+  Color changeColor = kWhitekColor;
 
   @override
   Widget build(BuildContext context) {
+    Widget customAppBar() {
+      return Container(
+        height: 60,
+        width: double.infinity,
+        color: Color.fromRGBO(255, 255, 255, _scrollOffset),
+        padding: EdgeInsets.symmetric(horizontal: defaultPadding),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Icon(
+                Icons.arrow_back,
+                color: changeColor,
+              ),
+            ),
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    // Share.share('check out my website https://example.com');
+                  },
+                  child: Icon(
+                    Icons.share,
+                    color: changeColor,
+                  ),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Icon(
+                  Icons.more_vert,
+                  color: changeColor,
+                ),
+              ],
+            )
+          ],
+        ),
+      );
+    }
+
     Widget itemInfo(String title, int total, IconData icon, Color color) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -672,6 +718,18 @@ class _DetailPageState extends State<DetailPage> {
                 });
               }
 
+              if (notification.metrics.axis.name == "vertical" &&
+                  notification.metrics.pixels / 100 <= 1) {
+                setState(() {
+                  _scrollOffset = notification.metrics.pixels / 100;
+                  changeColor = kWhitekColor;
+                });
+              } else {
+                setState(() {
+                  changeColor = kBlackColor;
+                });
+              }
+
               return true;
             },
             child: ListView(
@@ -683,7 +741,8 @@ class _DetailPageState extends State<DetailPage> {
                 peoplsPrayersSection(),
               ],
             ),
-          )
+          ),
+          customAppBar()
         ],
       ),
       bottomNavigationBar: Container(
