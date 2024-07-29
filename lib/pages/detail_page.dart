@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kitabantu/theme.dart';
+import 'package:share_plus/share_plus.dart';
 
 class DetailPage extends StatefulWidget {
   const DetailPage({super.key});
@@ -38,7 +39,7 @@ class _DetailPageState extends State<DetailPage> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    // Share.share('check out my website https://example.com');
+                    Share.share('check out my website https://example.com');
                   },
                   child: Icon(
                     Icons.share,
