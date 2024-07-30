@@ -22,7 +22,8 @@ class _CustomButtomNavigationBarState extends State<CustomButtomNavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
+      color: kWhitekColor,
       height: 67,
       width: double.infinity,
       child: Row(

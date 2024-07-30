@@ -1,6 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:kitabantu/pages/detail_page.dart';
+import 'package:kitabantu/pages/account_page.dart';
 import 'package:kitabantu/theme.dart';
 
 class HomePage extends StatefulWidget {
@@ -325,8 +325,9 @@ class _HomePageState extends State<HomePage> {
           const EdgeInsets.only(top: 30),
         ),
         bannerSection(const EdgeInsets.only(top: 30), () {
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPage()));
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => DetailPage()));
+              context, MaterialPageRoute(builder: (context) => AccountPage()));
         }),
         slideWithOptions(const EdgeInsets.only(top: 30), () {}, () {}),
         carouselSection(const EdgeInsets.only(top: 30), () {}),
