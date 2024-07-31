@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kitabantu/theme.dart';
 
-class InboxPage extends StatelessWidget {
-  const InboxPage({super.key});
+class HistoryPage extends StatelessWidget {
+  const HistoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +111,7 @@ class InboxPage extends StatelessWidget {
                 width: 10,
               ),
               Text(
-                'Notification',
+                'History',
                 style: blackTextStyle.copyWith(fontSize: 20),
               )
             ],

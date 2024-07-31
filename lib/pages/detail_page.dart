@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kitabantu/theme.dart';
+import 'package:kitabantu/widgets/custom_button.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DetailPage extends StatefulWidget {
@@ -13,7 +14,12 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   double heightScroll = 0;
   double _scrollOffset = 0.2;
+  bool _isVisiblePayment = false;
+  int _selectedItem = 0;
   Color changeColor = kWhitekColor;
+  TextEditingController amountController = TextEditingController(text: "");
+  DraggableScrollableController dragScrollController =
+      DraggableScrollableController();
 
   @override
   Widget build(BuildContext context) {
@@ -681,7 +687,7 @@ class _DetailPageState extends State<DetailPage> {
 
       return Container(
         padding: EdgeInsets.all(defaultPadding),
-        margin: const EdgeInsets.only(top: 10, bottom: 20),
+        margin: const EdgeInsets.only(top: 10, bottom: 80),
         width: double.infinity,
         color: kWhitekColor,
         child: Column(
@@ -689,6 +695,125 @@ class _DetailPageState extends State<DetailPage> {
             directItem('Doa-doa #Orang Baik', false, 58, () => null),
             personPrayer(() {}),
           ],
+        ),
+      );
+    }
+
+    Widget modalPayment() {
+      List itemSelected = [
+        {"emot": "😘", "value": 1000},
+        {"emot": "🥰", "value": 5000},
+        {"emot": "🥳", "value": 10000},
+        {"emot": "🤩", "value": 50000},
+      ];
+      Widget selectedItem(
+          int amount, String emot, int index, Function() onSelect) {
+        return GestureDetector(
+          onTap: onSelect,
+          child: Container(
+            height: 130,
+            width: 130,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                  width: 1.5,
+                  color: index == _selectedItem ? kPrimaryColor : kGreyColor),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  emot,
+                  style: blackTextStyle.copyWith(
+                    fontSize: 35,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                Text(
+                  NumberFormat.currency(symbol: "", decimalDigits: 0)
+                      .format(amount),
+                  style: blackTextStyle.copyWith(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      return SizedBox.expand(
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            if (notification.metrics.extentAfter >= 250) {
+              setState(() {
+                _isVisiblePayment = false;
+                _selectedItem = 0;
+              });
+            }
+            print(notification.metrics.extentAfter);
+            return true;
+          },
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.55,
+            minChildSize: 0,
+            maxChildSize: 0.55,
+            shouldCloseOnMinExtent: false,
+            builder: (context, scrollController) {
+              return Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  horizontal: defaultPadding,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                    color: kWhitekColor,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(18),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: kGreyColor,
+                        offset: const Offset(0, -0.5),
+                        blurRadius: 10,
+                      )
+                    ]),
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 3,
+                        width: 30,
+                        margin: const EdgeInsets.only(top: 5, bottom: 30),
+                        decoration: BoxDecoration(
+                          color: kGreyColor,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                      ),
+                      Wrap(
+                          spacing: 25,
+                          runSpacing: 25,
+                          children: itemSelected.asMap().entries.map((item) {
+                            return selectedItem(item.value["value"],
+                                item.value["emot"], item.key + 1, () {
+                              setState(() {
+                                _selectedItem = item.key + 1;
+                              });
+                            });
+                          }).toList()),
+                      CustomButton(
+                        title: "Lapnjutkan pembayaran",
+                        margin: const EdgeInsets.only(top: 20),
+                        onPressed: () {},
+                      )
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
         ),
       );
     }
@@ -750,27 +875,20 @@ class _DetailPageState extends State<DetailPage> {
               ],
             ),
           ),
-          customAppBar()
-        ],
-      ),
-      bottomNavigationBar: Container(
-        height: 70,
-        width: double.infinity,
-        color: kWhitekColor,
-        padding: EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 15),
-        child: TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          style: TextButton.styleFrom(backgroundColor: kDarkRedColor),
-          child: Text(
-            "Donasi sekarang",
-            style: whiteTextStyle.copyWith(
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
+          customAppBar(),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: CustomButton(
+              title: "Donasi sekarang",
+              onPressed: () {
+                setState(() {
+                  _isVisiblePayment = true;
+                });
+              },
             ),
           ),
-        ),
+          if (_isVisiblePayment) modalPayment()
+        ],
       ),
     );
   }
