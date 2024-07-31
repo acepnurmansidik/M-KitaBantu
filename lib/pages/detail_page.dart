@@ -804,9 +804,12 @@ class _DetailPageState extends State<DetailPage> {
                             });
                           }).toList()),
                       CustomButton(
-                        title: "Lapnjutkan pembayaran",
+                        title: "Lanjutkan pembayaran",
                         margin: const EdgeInsets.only(top: 20),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamedAndRemoveUntil(
+                              context, '/success', (context) => false);
+                        },
                       )
                     ],
                   ),
