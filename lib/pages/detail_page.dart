@@ -699,7 +699,7 @@ class _DetailPageState extends State<DetailPage> {
       );
     }
 
-    Widget modalPayment() {
+    Widget modalPayment(Function() onSubmit) {
       List itemSelected = [
         {"emot": "😘", "value": 1000},
         {"emot": "🥰", "value": 5000},
@@ -805,10 +805,7 @@ class _DetailPageState extends State<DetailPage> {
                       CustomButton(
                         title: "Lanjutkan pembayaran",
                         margin: const EdgeInsets.only(top: 20),
-                        onPressed: () {
-                          Navigator.pushNamedAndRemoveUntil(
-                              context, '/success', (context) => false);
-                        },
+                        onPressed: onSubmit,
                       )
                     ],
                   ),
@@ -889,7 +886,11 @@ class _DetailPageState extends State<DetailPage> {
               },
             ),
           ),
-          if (_isVisiblePayment) modalPayment()
+          if (_isVisiblePayment)
+            modalPayment(() {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/success', (context) => false);
+            })
         ],
       ),
     );
