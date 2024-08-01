@@ -752,7 +752,6 @@ class _DetailPageState extends State<DetailPage> {
                 _selectedItem = 0;
               });
             }
-            print(notification.metrics.extentAfter);
             return true;
           },
           child: DraggableScrollableSheet(

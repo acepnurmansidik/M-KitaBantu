@@ -1,7 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:kitabantu/pages/detail_page.dart';
 import 'package:kitabantu/theme.dart';
+import 'package:kitabantu/widgets/horizontal_slide_item.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -87,98 +87,40 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    Widget slideItem({title = "", margin, onDirect}) {
-      return GestureDetector(
-        onTap: onDirect,
-        child: Container(
-          alignment: Alignment.center,
-          width: double.infinity,
-          color: Colors.amber,
-          margin: margin,
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              title != ""
-                  ? Container(
-                      margin: const EdgeInsets.only(left: 20, bottom: 10),
-                      child: Text(
-                        title,
-                        style: blackTextStyle.copyWith(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    )
-                  : const SizedBox(),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    Container(
-                      height: 160,
-                      width: 180,
-                      margin: EdgeInsets.only(left: defaultPadding),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    Container(
-                      height: 160,
-                      width: 180,
-                      margin: EdgeInsets.only(left: defaultPadding),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    Container(
-                      height: 160,
-                      width: 180,
-                      margin: EdgeInsets.only(
-                        left: defaultPadding,
-                        right: defaultPadding,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
     Widget slideWithOptions(
         EdgeInsets marginVer, Function() onPressed, Function() onDirect) {
-      Widget itemSlide(EdgeInsets marginHorizontal) {
-        return GestureDetector(
-          onTap: onPressed,
-          child: Container(
-            height: 60,
-            width: 60,
-            padding: const EdgeInsets.all(5),
-            margin: marginHorizontal,
-            decoration: BoxDecoration(
-              color: kSecondaryColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Column(
+      List categories = [
+        {"title": "Pendidikan", "icon": Icons.school},
+        {"title": "Kemanusiaan", "icon": Icons.bloodtype},
+        {"title": "Panti Asuhan", "icon": Icons.home},
+        {"title": "Lingkungan", "icon": Icons.nature},
+      ];
+      Widget itemSlide(
+          String title, IconData icon, EdgeInsets marginHorizontal) {
+        return Container(
+          height: 40,
+          margin: marginHorizontal,
+          child: TextButton(
+            onPressed: onPressed,
+            style: TextButton.styleFrom(
+                side: BorderSide(width: 1, color: kPrimaryColor)),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  Icons.food_bank_outlined,
+                  icon,
                   color: kPrimaryColor,
-                  size: 30,
+                  size: 20,
+                ),
+                const SizedBox(
+                  width: 5,
                 ),
                 Text(
-                  'foods',
-                  style: primaryTextStyle.copyWith(fontSize: 12),
+                  title,
+                  style: blackTextStyle.copyWith(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
                 )
               ],
             ),
@@ -190,22 +132,29 @@ class _HomePageState extends State<HomePage> {
         width: double.infinity,
         margin: marginVer,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                children: [
-                  itemSlide(EdgeInsets.only(left: defaultPadding)),
-                  itemSlide(EdgeInsets.only(left: defaultPadding)),
-                  itemSlide(EdgeInsets.only(left: defaultPadding)),
-                  itemSlide(EdgeInsets.only(left: defaultPadding)),
-                  itemSlide(EdgeInsets.only(left: defaultPadding)),
-                  itemSlide(EdgeInsets.symmetric(horizontal: defaultPadding)),
-                ],
+                children: categories.asMap().entries.map((category) {
+                  return itemSlide(
+                    category.value["title"],
+                    category.value["icon"],
+                    EdgeInsets.only(
+                        left: category.key == 0
+                            ? defaultPadding
+                            : defaultPadding / 2,
+                        right: category.key == categories.length - 1
+                            ? defaultPadding
+                            : 0),
+                  );
+                }).toList(),
               ),
             ),
-            slideItem(
-                margin: const EdgeInsets.only(top: 10), onDirect: onDirect)
+            const HorizontalSlideItem(
+              bgAnimateImg: "",
+            ),
           ],
         ),
       );
@@ -279,7 +228,6 @@ class _HomePageState extends State<HomePage> {
                 items: data.map((item) {
                   return Container(
                     width: double.infinity,
-                    // margin: const EdgeInsets.symmetric(horizontal: 20),
                     decoration: BoxDecoration(
                       color: kPrimaryColor,
                     ),
@@ -324,13 +272,13 @@ class _HomePageState extends State<HomePage> {
         profileSection(
           const EdgeInsets.only(top: 30),
         ),
-        bannerSection(const EdgeInsets.only(top: 30), () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => DetailPage()));
-        }),
+        bannerSection(const EdgeInsets.only(top: 30), () {}),
         slideWithOptions(const EdgeInsets.only(top: 30), () {}, () {}),
         carouselSection(const EdgeInsets.only(top: 30), () {}),
-        slideItem(margin: const EdgeInsets.only(top: 30), onDirect: () {}),
+        const HorizontalSlideItem(
+          startAtMargin: 150,
+          bgAnimateImg: "assets/img_prayer.png",
+        ),
       ],
     );
   }
