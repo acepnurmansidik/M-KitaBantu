@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kitabantu/cubit/page_cubit.dart';
 import 'package:kitabantu/pages/get_startred_page.dart';
 import 'package:kitabantu/pages/main_page.dart';
 import 'package:kitabantu/pages/signin_page.dart';
@@ -15,16 +17,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      routes: {
-        '/': (context) => const SplashScreenPage(),
-        '/get-started': (context) => const GetStartedPage(),
-        '/main': (context) => const MainPage(),
-        '/success': (context) => const SuccessPage(),
-        '/sign-in': (context) => const SigninPage(),
-        '/sign-up': (context) => const SignupPage(),
-      },
-    );
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => PageCubit(),
+          ),
+        ],
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          routes: {
+            '/': (context) => const SplashScreenPage(),
+            '/get-started': (context) => const GetStartedPage(),
+            '/main': (context) => const MainPage(),
+            '/success': (context) => const SuccessPage(),
+            '/sign-in': (context) => const SigninPage(),
+            '/sign-up': (context) => const SignupPage(),
+          },
+        ));
   }
 }

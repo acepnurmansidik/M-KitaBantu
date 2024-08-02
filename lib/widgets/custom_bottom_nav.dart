@@ -1,6 +1,8 @@
 // ignore_for_file: dead_code
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kitabantu/cubit/page_cubit.dart';
 import 'package:kitabantu/theme.dart';
 
 class CustomButtomNavigationBar extends StatefulWidget {
@@ -33,6 +35,7 @@ class _CustomButtomNavigationBarState extends State<CustomButtomNavigationBar> {
             onTap: () {
               setState(() {
                 currentIndex = item.key;
+                context.read<PageCubit>().setPage(item.key);
               });
             },
             child: Column(
