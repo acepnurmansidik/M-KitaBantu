@@ -34,6 +34,17 @@ class _GetStartedPageState extends State<GetStartedPage> {
           'Building strong relationships with donors through effective communication and transparency is the key to achieving success in fundraising.',
     },
   ];
+  void _directToPage() {
+    Navigator.pushNamedAndRemoveUntil(context, '/sign-up', (route) => false);
+  }
+
+  void _skipCarousel() {
+    controllerCarousel.animateToPage(
+      onboardingItems.length - 1,
+      duration: const Duration(seconds: 1),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,13 +87,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
                             backgroundColor: kWhitekColor,
                             side: BorderSide(color: kPrimaryColor),
                           ),
-                          onPressed: () {
-                            controllerCarousel.animateToPage(
-                              onboardingItems.length - 1,
-                              duration: const Duration(seconds: 1),
-                              curve: Curves.easeInOut,
-                            );
-                          },
+                          onPressed: _skipCarousel,
                           child: Text(
                             'Skip',
                             style: primaryTextStyle.copyWith(
@@ -101,10 +106,7 @@ class _GetStartedPageState extends State<GetStartedPage> {
                               style: TextButton.styleFrom(
                                 backgroundColor: kPrimaryColor,
                               ),
-                              onPressed: () {
-                                Navigator.pushNamedAndRemoveUntil(
-                                    context, '/main', (route) => false);
-                              },
+                              onPressed: _directToPage,
                               child: Text(
                                 'Get Started',
                                 style: whiteTextStyle.copyWith(
