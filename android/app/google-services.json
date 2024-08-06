@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "427500456148",
+    "project_id": "kitabantu-e5076",
+    "storage_bucket": "kitabantu-e5076.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427500456148:android:8539eee2a21e0b6eae5341",
+        "android_client_info": {
+          "package_name": "com.example.kitabantu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOgnB_pkUpP0d9_DeCBRk5ecmLgYnN6VU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
