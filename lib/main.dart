@@ -9,40 +9,24 @@ import 'package:kitabantu/pages/signup_page.dart';
 import 'package:kitabantu/pages/splash_page.dart';
 import 'package:kitabantu/pages/success_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:kitabantu/services/notification_service.dart';
 import 'firebase_options.dart';
 
-Future<void> _firebaseMessagingBackgroundHandler() async {
-  // Handle a background message
-  final fcmToken = await FirebaseMessaging.instance.getToken();
-  print(fcmToken);
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // Handle the message here.
+  print("Handling a background message: ${message.messageId}");
+  print(message.notification);
+  // print(message.data);
 }
 
+final navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // Request permission
-  FirebaseMessaging.instance.requestPermission();
-  await FirebaseMessaging.instance.setAutoInitEnabled(true);
-  FirebaseMessaging.instance.getInitialMessage();
-  // FirebaseMessaging.onMessage.listen((message) {
-  //   print("onMessage");
-  //   print(message.notification);
-  //   print(message.notification);
-  // });
+  await NotificationService().initNotification();
 
-  // FirebaseMessaging.onMessageOpenedApp.listen((message) {
-  //   print("onMessageOpenedApp");
-  //   print(message);
-  // });
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  // FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
-  //   // TODO: If necessary send token to application server.
-  //   print(fcmToken);
-  //   // Note: This callback is fired at each app startup and whenever a new
-  //   // token is generated.
-  // }).onError((err) {
-  //   // Error getting token.
-  // });
   runApp(const MyApp());
 }
 
@@ -59,6 +43,7 @@ class MyApp extends StatelessWidget {
         ],
         child: MaterialApp(
           debugShowCheckedModeBanner: false,
+          navigatorKey: navigatorKey,
           routes: {
             '/': (context) => const SplashScreenPage(),
             '/get-started': (context) => const GetStartedPage(),
