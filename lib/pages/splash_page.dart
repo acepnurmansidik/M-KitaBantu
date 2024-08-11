@@ -14,8 +14,6 @@ class SplashScreenPage extends StatelessWidget {
     Timer(const Duration(seconds: 3), () async {
       final result = await AuthService().getToken();
 
-      print(result.onboard);
-
       if (result.token != "" && result.onboard ||
           result.token == "" && result.onboard) {
         Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);

@@ -1,5 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kitabantu/cubit/categories_cubit.dart';
 import 'package:kitabantu/theme.dart';
 import 'package:kitabantu/widgets/horizontal_slide_item.dart';
 
@@ -13,6 +15,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
   CarouselController controller = CarouselController();
+
+  @override
+  void initState() {
+    context.read<CategoriesCubit>().fetchCategories();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +101,13 @@ class _HomePageState extends State<HomePage> {
         {"title": "Pendidikan", "icon": Icons.school},
         {"title": "Kemanusiaan", "icon": Icons.bloodtype},
         {"title": "Panti Asuhan", "icon": Icons.home},
-        {"title": "Lingkungan", "icon": Icons.nature},
       ];
+      Map iconCategories = {
+        "Pendidikan": Icons.school,
+        "Kemanusiaan": Icons.bloodtype,
+        "Panti Asuhan": Icons.home,
+        "Lingkungan": Icons.nature,
+      };
       Widget itemSlide(
           String title, IconData icon, EdgeInsets marginHorizontal) {
         return Container(
@@ -136,20 +149,41 @@ class _HomePageState extends State<HomePage> {
           children: [
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children: categories.asMap().entries.map((category) {
-                  return itemSlide(
-                    category.value["title"],
-                    category.value["icon"],
-                    EdgeInsets.only(
-                        left: category.key == 0
-                            ? defaultPadding
-                            : defaultPadding / 2,
-                        right: category.key == categories.length - 1
-                            ? defaultPadding
-                            : 0),
+              child: BlocBuilder<CategoriesCubit, CategoriesState>(
+                builder: (context, state) {
+                  if (state is CategoriesSuccess) {
+                    return Row(
+                        children:
+                            state.categories.asMap().entries.map((category) {
+                      return itemSlide(
+                        category.value.title,
+                        iconCategories[category.value.title],
+                        EdgeInsets.only(
+                            left: category.key == 0
+                                ? defaultPadding
+                                : defaultPadding / 2,
+                            right: category.key == state.categories.length - 1
+                                ? defaultPadding
+                                : 0),
+                      );
+                    }).toList());
+                  }
+                  return Row(
+                    children: categories.asMap().entries.map((category) {
+                      return itemSlide(
+                        "           ",
+                        Icons.dangerous_rounded,
+                        EdgeInsets.only(
+                            left: category.key == 0
+                                ? defaultPadding
+                                : defaultPadding / 2,
+                            right: category.key == categories.length - 1
+                                ? defaultPadding
+                                : 0),
+                      );
+                    }).toList(),
                   );
-                }).toList(),
+                },
               ),
             ),
             const HorizontalSlideItem(
