@@ -1,6 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:kitabantu/services/auth_service.dart';
 import 'package:kitabantu/theme.dart';
 
 class SplashScreenPage extends StatelessWidget {
@@ -8,9 +11,18 @@ class SplashScreenPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Timer(const Duration(seconds: 3), () {
-      Navigator.pushNamedAndRemoveUntil(
-          context, '/get-started', (route) => false);
+    Timer(const Duration(seconds: 3), () async {
+      final result = await AuthService().getToken();
+
+      print(result.onboard);
+
+      if (result.token != "" && result.onboard ||
+          result.token == "" && result.onboard) {
+        Navigator.pushNamedAndRemoveUntil(context, '/main', (route) => false);
+      } else {
+        Navigator.pushNamedAndRemoveUntil(
+            context, '/get-started', (route) => false);
+      }
     });
     return Scaffold(
       body: Center(

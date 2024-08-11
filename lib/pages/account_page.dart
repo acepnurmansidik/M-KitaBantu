@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kitabantu/cubit/auth_cubit.dart';
+import 'package:kitabantu/cubit/page_cubit.dart';
 import 'package:kitabantu/theme.dart';
 
-class AccountPage extends StatelessWidget {
+class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
+
+  @override
+  State<AccountPage> createState() => _AccountPageState();
+}
+
+class _AccountPageState extends State<AccountPage> {
+  @override
+  void initState() {
+    context.read<AuthCubit>().checkToken();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +141,15 @@ class AccountPage extends StatelessWidget {
               true,
               () {},
             ),
-            itemMenu("Exit", Icons.exit_to_app_rounded, false, () {}),
+            context.watch<AuthCubit>().isLogin
+                ? itemMenu("Exit", Icons.logout_rounded, false, () {
+                    context.read<AuthCubit>().logOut();
+                    context.read<PageCubit>().setPage(0);
+                  })
+                : itemMenu("Login", Icons.login_rounded, false, () {
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/sign-in', (context) => false);
+                  }),
           ],
         ),
       );

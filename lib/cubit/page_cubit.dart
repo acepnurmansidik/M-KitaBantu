@@ -6,8 +6,5 @@ class PageCubit extends Cubit<int> {
 
   void setPage(int page) async {
     emit(page);
-
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    print(fcmToken);
   }
 }

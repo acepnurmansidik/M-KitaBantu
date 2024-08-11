@@ -1,7 +1,9 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kitabantu/cubit/auth_cubit.dart';
 import 'package:kitabantu/cubit/page_cubit.dart';
+import 'package:kitabantu/cubit/users_cubit.dart';
 import 'package:kitabantu/pages/get_startred_page.dart';
 import 'package:kitabantu/pages/main_page.dart';
 import 'package:kitabantu/pages/signin_page.dart';
@@ -39,6 +41,12 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (context) => PageCubit(),
+          ),
+          BlocProvider(
+            create: (context) => UsersCubit(),
+          ),
+          BlocProvider(
+            create: (context) => AuthCubit(),
           ),
         ],
         child: MaterialApp(

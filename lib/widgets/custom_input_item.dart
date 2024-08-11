@@ -6,6 +6,7 @@ class CustomInputItem extends StatefulWidget {
   final String hintText;
   final EdgeInsets margin;
   final bool showIcon;
+  final bool isPassword;
 
   const CustomInputItem({
     super.key,
@@ -13,6 +14,7 @@ class CustomInputItem extends StatefulWidget {
     required this.hintText,
     required this.margin,
     this.showIcon = false,
+    this.isPassword = true,
   });
 
   @override
@@ -35,7 +37,7 @@ class _CustomInputItemState extends State<CustomInputItem> {
       child: TextFormField(
         controller: widget.controller,
         cursorColor: kBlackColor,
-        obscureText: _visiblePassword,
+        obscureText: !widget.isPassword ? false : _visiblePassword,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.only(
             right: 45,

@@ -72,10 +72,8 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (payload) async {
-        if (payload != null) {
-          navigatorKey.currentState!
-              .push(MaterialPageRoute(builder: (context) => DetailPage()));
-        }
+        navigatorKey.currentState!
+            .push(MaterialPageRoute(builder: (context) => const DetailPage()));
       },
     );
   }

@@ -14,7 +14,6 @@ class CustomButtomNavigationBar extends StatefulWidget {
 }
 
 class _CustomButtomNavigationBarState extends State<CustomButtomNavigationBar> {
-  int currentIndex = 0;
   List icons = [
     "assets/icon_home",
     "assets/icon_time",
@@ -34,7 +33,6 @@ class _CustomButtomNavigationBarState extends State<CustomButtomNavigationBar> {
           return GestureDetector(
             onTap: () {
               setState(() {
-                currentIndex = item.key;
                 context.read<PageCubit>().setPage(item.key);
               });
             },
@@ -48,12 +46,12 @@ class _CustomButtomNavigationBarState extends State<CustomButtomNavigationBar> {
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage(
-                        '${item.value}${currentIndex == item.key ? '_rouded.png' : '.png'}',
+                        '${item.value}${context.watch<PageCubit>().state == item.key ? '_rouded.png' : '.png'}',
                       ),
                     ),
                   ),
                 ),
-                currentIndex == item.key
+                context.watch<PageCubit>().state == item.key
                     ? Container(
                         height: 4,
                         width: 25,

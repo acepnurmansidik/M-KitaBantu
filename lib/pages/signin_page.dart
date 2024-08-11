@@ -1,4 +1,8 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kitabantu/cubit/users_cubit.dart';
+import 'package:kitabantu/models/users_model.dart';
 import 'package:kitabantu/theme.dart';
 import 'package:kitabantu/widgets/custom_button.dart';
 import 'package:kitabantu/widgets/custom_input_item.dart';
@@ -11,9 +15,17 @@ class SigninPage extends StatefulWidget {
 }
 
 class _SigninPageState extends State<SigninPage> {
+  TextEditingController emailController = TextEditingController(text: "");
+  TextEditingController passwordController = TextEditingController(text: "");
+
   void _forgotPassword() {}
-  void _signIn() {
-    Navigator.pushNamedAndRemoveUntil(context, '/main', (context) => false);
+  void _login() async {
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    context.read<UsersCubit>().signIn(LoginModel(
+          email: emailController.text,
+          password: passwordController.text,
+          deviceToken: fcmToken.toString(),
+        ));
   }
 
   void _directToSignUp() {
@@ -25,9 +37,6 @@ class _SigninPageState extends State<SigninPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController emailController = TextEditingController(text: "");
-    TextEditingController passwordController = TextEditingController(text: "");
-
     return Scaffold(
       body: ListView(
         children: [
@@ -58,6 +67,7 @@ class _SigninPageState extends State<SigninPage> {
             hintText: "Email",
             margin: EdgeInsets.only(
                 top: 30, right: defaultPadding, left: defaultPadding),
+            isPassword: false,
           ),
           CustomInputItem(
             controller: passwordController,
@@ -81,12 +91,33 @@ class _SigninPageState extends State<SigninPage> {
               ),
             ),
           ),
-          CustomButton(
-            title: 'Login',
-            onPressed: _signIn,
-            height: 62,
-            bgColor: kPrimaryColor,
-            margin: const EdgeInsets.only(top: 30),
+          BlocConsumer<UsersCubit, UsersState>(
+            listener: (context, state) {
+              if (state is UsersLoginSuccess) {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/main', (context) => false);
+              }
+            },
+            builder: (context, state) {
+              if (state is UsersLoading) {
+                return Container(
+                  height: 62,
+                  padding: EdgeInsets.symmetric(
+                      horizontal: defaultPadding, vertical: 5),
+                  margin: const EdgeInsets.only(top: 30),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              return CustomButton(
+                title: 'Login',
+                onPressed: _login,
+                height: 62,
+                bgColor: kPrimaryColor,
+                margin: const EdgeInsets.only(top: 30),
+              );
+            },
           ),
           Container(
             margin: const EdgeInsets.only(top: 20),

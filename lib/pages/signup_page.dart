@@ -1,4 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kitabantu/cubit/users_cubit.dart';
+import 'package:kitabantu/models/users_model.dart';
 import 'package:kitabantu/theme.dart';
 import 'package:kitabantu/widgets/custom_button.dart';
 import 'package:kitabantu/widgets/custom_input_item.dart';
@@ -11,21 +17,35 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
+  TextEditingController usernameController = TextEditingController(text: "");
+  TextEditingController emailController = TextEditingController(text: "");
+  TextEditingController passwordController = TextEditingController(text: "");
+  TextEditingController confirmPasswordController =
+      TextEditingController(text: "");
+
   void _directToSignIn() {
     Navigator.pushNamedAndRemoveUntil(context, '/sign-in', (context) => false);
   }
 
-  void _register() {}
+  void _register() async {
+    if (passwordController.text == confirmPasswordController.text) {
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      context.read<UsersCubit>().signUp(
+            RegisterModel(
+              email: emailController.text,
+              password: passwordController.text,
+              deviceToken: fcmToken.toString(),
+              username: usernameController.text,
+            ),
+          );
+    }
+  }
+
   void _appleAccount() {}
   void _googleAccount() {}
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController emailController = TextEditingController(text: "");
-    TextEditingController passwordController = TextEditingController(text: "");
-    TextEditingController confirmPasswordController =
-        TextEditingController(text: "");
-
     return Scaffold(
       body: ListView(
         children: [
@@ -54,10 +74,18 @@ class _SignupPageState extends State<SignupPage> {
             ),
           ),
           CustomInputItem(
+            controller: usernameController,
+            hintText: "Username",
+            margin: EdgeInsets.only(
+                top: 30, right: defaultPadding, left: defaultPadding),
+            isPassword: false,
+          ),
+          CustomInputItem(
             controller: emailController,
             hintText: "Email",
             margin: EdgeInsets.only(
-                top: 30, right: defaultPadding, left: defaultPadding),
+                top: 10, right: defaultPadding, left: defaultPadding),
+            isPassword: false,
           ),
           CustomInputItem(
             controller: passwordController,
@@ -73,12 +101,34 @@ class _SignupPageState extends State<SignupPage> {
                 top: 10, right: defaultPadding, left: defaultPadding),
             showIcon: true,
           ),
-          CustomButton(
-            title: 'Register',
-            onPressed: _register,
-            height: 62,
-            bgColor: kPrimaryColor,
-            margin: const EdgeInsets.only(top: 30),
+          BlocConsumer<UsersCubit, UsersState>(
+            listener: (context, state) {
+              if (state is UsersFailed) {
+              } else if (state is UsersRegisterSuccess) {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/main', (route) => false);
+              }
+            },
+            builder: (context, state) {
+              if (state is UsersLoading) {
+                return Container(
+                  height: 62,
+                  padding: EdgeInsets.symmetric(
+                      horizontal: defaultPadding, vertical: 5),
+                  margin: const EdgeInsets.only(top: 30),
+                  child: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+              return CustomButton(
+                title: 'Register',
+                onPressed: _register,
+                height: 62,
+                bgColor: kPrimaryColor,
+                margin: const EdgeInsets.only(top: 30),
+              );
+            },
           ),
           Container(
             margin: const EdgeInsets.only(top: 20),
