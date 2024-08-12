@@ -14,8 +14,8 @@ final class AuthLoading extends AuthState {}
 final class AuthSuccess extends AuthState {}
 
 final class AuthFailed extends AuthState {
-  String error;
-  AuthFailed(this.error);
+  final String error;
+  const AuthFailed(this.error);
 
   @override
   List<Object> get props => [error];

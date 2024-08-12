@@ -16,9 +16,9 @@ final class UsersRegisterSuccess extends UsersState {}
 final class UsersLoginSuccess extends UsersState {}
 
 final class UsersFailed extends UsersState {
-  String error;
+  final String error;
 
-  UsersFailed(this.error);
+  const UsersFailed(this.error);
 
   @override
   List<Object> get props => [error];

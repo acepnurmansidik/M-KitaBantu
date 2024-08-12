@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kitabantu/cubit/auth_cubit.dart';
+import 'package:kitabantu/cubit/campaign_cubit.dart';
 import 'package:kitabantu/cubit/categories_cubit.dart';
 import 'package:kitabantu/cubit/page_cubit.dart';
 import 'package:kitabantu/cubit/users_cubit.dart';
@@ -17,8 +18,8 @@ import 'firebase_options.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Handle the message here.
-  print("Handling a background message: ${message.messageId}");
-  print(message.notification);
+  // print("Handling a background message: ${message.messageId}");
+  // print(message.notification);
   // print(message.data);
 }
 
@@ -51,6 +52,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => CategoriesCubit(),
+          ),
+          BlocProvider(
+            create: (context) => CampaignCubit(),
           ),
         ],
         child: MaterialApp(

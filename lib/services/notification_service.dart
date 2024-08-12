@@ -39,8 +39,7 @@ class NotificationService {
     });
 
     FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
-      // TODO: If necessary send token to application server.
-      print(fcmToken);
+      // print(fcmToken);
       // Note: This callback is fired at each app startup and whenever a new
       // token is generated.
     }).onError((err) {
@@ -73,7 +72,7 @@ class NotificationService {
       initializationSettings,
       onDidReceiveNotificationResponse: (payload) async {
         navigatorKey.currentState!
-            .push(MaterialPageRoute(builder: (context) => const DetailPage()));
+            .push(MaterialPageRoute(builder: (context) => DetailPage()));
       },
     );
   }

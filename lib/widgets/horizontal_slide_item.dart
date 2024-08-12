@@ -1,15 +1,20 @@
+// ignore_for_file: unnecessary_string_interpolations
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kitabantu/models/campaign_model.dart';
 import 'package:kitabantu/pages/detail_page.dart';
 import 'package:kitabantu/theme.dart';
 
 class HorizontalSlideItem extends StatefulWidget {
+  final List campaigns;
   final String title;
   final String bgAnimateImg;
   final double startAtMargin;
 
   const HorizontalSlideItem({
     super.key,
+    required this.campaigns,
     this.title = "",
     this.bgAnimateImg = "",
     this.startAtMargin = 20,
@@ -25,13 +30,15 @@ class _HorizontalSlideItemState extends State<HorizontalSlideItem> {
 
   @override
   Widget build(BuildContext context) {
-    Widget slideItem(EdgeInsets margin) {
+    Widget slideItem(CampaignModel dataCampaign, EdgeInsets margin) {
       return GestureDetector(
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const DetailPage(),
+              builder: (context) => DetailPage(
+                dataCampaign: dataCampaign,
+              ),
             ),
           );
         },
@@ -56,8 +63,16 @@ class _HorizontalSlideItemState extends State<HorizontalSlideItem> {
               Container(
                 height: 115,
                 decoration: BoxDecoration(
-                    color: kPrimaryColor,
-                    borderRadius: BorderRadius.circular(10)),
+                  borderRadius: BorderRadius.circular(10),
+                  image: dataCampaign.images.isNotEmpty
+                      ? DecorationImage(
+                          image: NetworkImage(
+                              '${dataCampaign.images.first.linkUrl}'),
+                        )
+                      : const DecorationImage(
+                          image: AssetImage('assets/icon_blank_picture.png'),
+                        ),
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -68,7 +83,7 @@ class _HorizontalSlideItemState extends State<HorizontalSlideItem> {
                       height: 5,
                     ),
                     Text(
-                      "Kebahagiaan berbagi sesama untuk yang membutuhkan uluran tangan",
+                      dataCampaign.campaignName,
                       style: blackTextStyle.copyWith(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -90,7 +105,7 @@ class _HorizontalSlideItemState extends State<HorizontalSlideItem> {
                             TextSpan(
                               text: NumberFormat.currency(
                                       symbol: "", decimalDigits: 0)
-                                  .format(4000000),
+                                  .format(dataCampaign.totalDonate),
                               style: primaryTextStyle.copyWith(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w800,
@@ -113,7 +128,8 @@ class _HorizontalSlideItemState extends State<HorizontalSlideItem> {
                           height: 5,
                           width: (MediaQuery.of(context).size.width -
                                   (2 * defaultPadding + 180)) *
-                              (70 / 100),
+                              (dataCampaign.totalDonate /
+                                  dataCampaign.amountRequire),
                           margin: const EdgeInsets.only(top: 10),
                           decoration: BoxDecoration(
                             color: kPrimaryColor,
@@ -195,12 +211,16 @@ class _HorizontalSlideItemState extends State<HorizontalSlideItem> {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: [
-                      slideItem(EdgeInsets.only(left: widget.startAtMargin)),
-                      slideItem(EdgeInsets.only(left: 20)),
-                      slideItem(EdgeInsets.only(left: 20)),
-                      slideItem(EdgeInsets.only(left: 20, right: 20)),
-                    ],
+                    children: widget.campaigns.asMap().entries.map((campaign) {
+                      return slideItem(
+                        campaign.value,
+                        EdgeInsets.only(
+                            left: campaign.key == 0 ? widget.startAtMargin : 20,
+                            right: campaign.key == widget.campaigns.length - 1
+                                ? 20
+                                : 0),
+                      );
+                    }).toList(),
                   ),
                 ),
               ),

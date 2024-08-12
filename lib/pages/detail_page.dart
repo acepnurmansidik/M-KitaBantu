@@ -1,12 +1,13 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kitabantu/models/campaign_model.dart';
 import 'package:kitabantu/theme.dart';
 import 'package:kitabantu/widgets/custom_button.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DetailPage extends StatefulWidget {
-  const DetailPage({super.key});
+  final CampaignModel? dataCampaign;
+  const DetailPage({super.key, this.dataCampaign});
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -24,7 +25,6 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final message = ModalRoute.of(context)!.settings.arguments;
     Widget customAppBar() {
       return Container(
         height: 60,
@@ -178,7 +178,7 @@ class _DetailPageState extends State<DetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Bantu sesama kemanusiaan',
+              widget.dataCampaign!.campaignName,
               style: blackTextStyle.copyWith(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -195,7 +195,7 @@ class _DetailPageState extends State<DetailPage> {
                       margin: const EdgeInsets.only(top: 5),
                       child: Text(
                         NumberFormat.currency(symbol: "Rp. ", decimalDigits: 0)
-                            .format(20000000),
+                            .format(widget.dataCampaign!.amountRequire),
                         style: primaryTextStyle.copyWith(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
@@ -215,7 +215,7 @@ class _DetailPageState extends State<DetailPage> {
                             TextSpan(
                               text: NumberFormat.currency(
                                       symbol: "Rp. ", decimalDigits: 0)
-                                  .format(200000),
+                                  .format(widget.dataCampaign!.totalDonate),
                               style: blackTextStyle.copyWith(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w800,
@@ -268,7 +268,7 @@ class _DetailPageState extends State<DetailPage> {
               children: [
                 itemInfo(
                   "Donasi",
-                  4000,
+                  widget.dataCampaign!.campaignComments.length,
                   Icons.favorite_rounded,
                   kRedColor,
                 ),
@@ -336,7 +336,7 @@ class _DetailPageState extends State<DetailPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Sahabat oerang baik',
+                            widget.dataCampaign!.organizer["name"],
                             style: blackTextStyle.copyWith(
                               fontSize: 14,
                               fontWeight: FontWeight.w800,
@@ -432,16 +432,14 @@ class _DetailPageState extends State<DetailPage> {
                   Stack(
                     children: [
                       SizedBox(
-                        height: 200,
-                        child: const Text(
-                          "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+                        child: Text(
+                          widget.dataCampaign!.description,
                           textAlign: TextAlign.justify,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 10,
                         ),
                       ),
                       Container(
-                        height: 70,
                         margin: const EdgeInsets.only(top: 130),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
@@ -588,7 +586,8 @@ class _DetailPageState extends State<DetailPage> {
         );
       }
 
-      Widget personPrayer(Function() onPressed) {
+      Widget personPrayer(
+          CampaignCommentsModel personComment, Function() onPressed) {
         return Container(
           padding: EdgeInsets.all(defaultPadding),
           margin: const EdgeInsets.only(top: 15),
@@ -621,7 +620,7 @@ class _DetailPageState extends State<DetailPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Orang Baik',
+                          personComment.name,
                           style: blackTextStyle.copyWith(
                             fontSize: 12,
                             fontWeight: FontWeight.w800,
@@ -644,7 +643,7 @@ class _DetailPageState extends State<DetailPage> {
                 height: 10,
               ),
               Text(
-                "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+                personComment.comment,
                 style: blackTextStyle.copyWith(
                   fontSize: 12,
                 ),
@@ -694,8 +693,15 @@ class _DetailPageState extends State<DetailPage> {
         color: kWhitekColor,
         child: Column(
           children: [
-            directItem('Doa-doa #Orang Baik', false, 58, () => null),
-            personPrayer(() {}),
+            directItem('Doa-doa #Orang Baik', false,
+                widget.dataCampaign!.campaignComments.length, () => null),
+            Column(
+              children: widget.dataCampaign!.campaignComments
+                  .map(
+                    (comment) => personPrayer(comment, () {}),
+                  )
+                  .toList(),
+            )
           ],
         ),
       );
@@ -836,6 +842,16 @@ class _DetailPageState extends State<DetailPage> {
               borderRadius: const BorderRadius.vertical(
                 bottom: Radius.circular(100),
               ),
+              image: widget.dataCampaign!.images.isNotEmpty
+                  ? DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage(
+                          '${widget.dataCampaign!.images.first.linkUrl}'),
+                    )
+                  : const DecorationImage(
+                      fit: BoxFit.cover,
+                      image: AssetImage('assets/icon_blank_picture.png'),
+                    ),
             ),
           ),
           NotificationListener<ScrollNotification>(
