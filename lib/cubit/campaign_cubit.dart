@@ -22,7 +22,8 @@ class CampaignCubit extends Cubit<CampaignState> {
     try {
       emit(CampaignILoading());
       await CampaignService().postDonateCampaign(body);
-      emit(CampaignDonateCampaignSuccess());
+      final campaigns = await CampaignService().getCampaigns();
+      emit(CampaignSuccess(campaigns));
     } catch (e) {
       emit(CampaignFailed(e.toString()));
     }

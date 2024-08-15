@@ -7,13 +7,6 @@ class BankModel {
   factory BankModel.fromJson(Map<String, dynamic> json) {
     return BankModel(name: json['name'], bankCode: json['bank_code']);
   }
-
-  // Map<String, dynamic> toJSON() {
-  //   return {
-  //     "name": name,
-  //     "bank_code": bankCode,
-  //   };
-  // }
 }
 
 class PostBankModel {
@@ -33,7 +26,7 @@ class PostBankModel {
     return {
       "bank_name": bankName,
       "bank_code": bankCode,
-      "account_code": accountName,
+      "account_name": accountName,
       "account_number": accountNumber,
     };
   }

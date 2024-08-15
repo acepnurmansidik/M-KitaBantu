@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:kitabantu/models/bank_model.dart';
 
 class ImagesModel {
@@ -17,25 +19,25 @@ class ImagesModel {
   }
 }
 
-// class DonateCampaignModel {
-//   final String id;
-//   final String nominal;
-//   final String date;
+class DonateCampaign {
+  final String id;
+  final int nominal;
+  final String date;
 
-//   DonateCampaignModel({
-//     required this.id,
-//     required this.nominal,
-//     required this.date,
-//   });
+  DonateCampaign({
+    required this.id,
+    required this.nominal,
+    required this.date,
+  });
 
-//   factory DonateCampaignModel.fromJson(Map<String, dynamic> json) {
-//     return DonateCampaignModel(
-//       id: json['id'],
-//       nominal: json['nominal'],
-//       date: json['date'],
-//     );
-//   }
-// }
+  factory DonateCampaign.fromJson(Map<String, dynamic> json) {
+    return DonateCampaign(
+      id: json['id'],
+      nominal: json['nominal'],
+      date: json['date'],
+    );
+  }
+}
 
 class CampaignCommentsModel {
   final String id;
@@ -72,10 +74,12 @@ class CampaignModel {
   final String description;
   final String startDate;
   final String endDate;
+  final String deadlines;
   final Map<String, dynamic> category;
   final Map<String, dynamic> organizer;
   final List<ImagesModel> images;
   final List<CampaignCommentsModel> campaignComments;
+  final List<DonateCampaign> donateCampaign;
 
   CampaignModel({
     required this.id,
@@ -86,10 +90,12 @@ class CampaignModel {
     required this.description,
     required this.startDate,
     required this.endDate,
+    required this.deadlines,
     required this.category,
     required this.organizer,
     required this.images,
     required this.campaignComments,
+    required this.donateCampaign,
   });
 
   factory CampaignModel.fromJson(Map<String, dynamic> json) {
@@ -102,6 +108,7 @@ class CampaignModel {
       description: json['description'],
       startDate: json['start_date'],
       endDate: json['end_date'],
+      deadlines: json['deadlines'],
       category: json['category'],
       organizer: json['organizer'],
       images: (json['images'] as List<dynamic>)
@@ -109,6 +116,9 @@ class CampaignModel {
           .toList(),
       campaignComments: (json['campaign_comments'] as List<dynamic>)
           .map((comment) => CampaignCommentsModel.fromJson(comment))
+          .toList(),
+      donateCampaign: (json['donate_campaigns'] as List<dynamic>)
+          .map((comment) => DonateCampaign.fromJson(comment))
           .toList(),
     );
   }
@@ -135,15 +145,15 @@ class CommentarModel {
 class DonateCampaignModel {
   final String campaignName;
   final String slugName;
-  final int amount;
-  final int nominal;
+  final String amount;
+  final String nominal;
   final String description;
   final String organizerId;
   final String campaignId;
   final PostBankModel bank;
   final CommentarModel comment;
 
-  const DonateCampaignModel({
+  DonateCampaignModel({
     required this.campaignName,
     required this.slugName,
     required this.amount,
@@ -164,8 +174,8 @@ class DonateCampaignModel {
       "description": description,
       "organizer_id": organizerId,
       "campaign_id": campaignId,
-      "bank": bank.toJSON(),
-      "comment": comment.toJSON()
+      "bank": jsonEncode(bank.toJSON()),
+      "comment": jsonEncode(comment.toJSON())
     };
   }
 }

@@ -7,6 +7,7 @@ import 'package:kitabantu/models/bank_model.dart';
 import 'package:kitabantu/models/campaign_model.dart';
 import 'package:kitabantu/theme.dart';
 import 'package:kitabantu/widgets/custom_button.dart';
+import 'package:kitabantu/widgets/loading_animation.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DetailPage extends StatefulWidget {
@@ -23,10 +24,9 @@ class _DetailPageState extends State<DetailPage> {
   bool _isVisiblePayment = false;
   int _selectedItem = 0;
   int _selectedBank = -1;
-  int _nominalSelected = 0;
+  String _nominalSelected = "";
   String _bankNameSelect = "";
   String _codeBankSelect = "";
-  String _accountNameSelect = "";
 
   Color changeColor = kWhitekColor;
   TextEditingController nameController = TextEditingController(text: "");
@@ -41,6 +41,30 @@ class _DetailPageState extends State<DetailPage> {
   void initState() {
     context.read<BanksCubit>().fectBanks();
     super.initState();
+  }
+
+  void _paymentDonate() {
+    context.read<CampaignCubit>().createUserDonateCampaign(
+          DonateCampaignModel(
+            campaignName: widget.dataCampaign!.campaignName,
+            slugName: widget.dataCampaign!.slugName,
+            amount: widget.dataCampaign!.amountRequire.toString(),
+            nominal: _nominalSelected,
+            description: widget.dataCampaign!.description,
+            organizerId: widget.dataCampaign!.organizer["id"],
+            campaignId: widget.dataCampaign!.id,
+            bank: PostBankModel(
+              bankName: _bankNameSelect,
+              bankCode: _codeBankSelect,
+              accountName: nameController.text,
+              accountNumber: bankAccountNumberController.text,
+            ),
+            comment: CommentarModel(
+              comment: commentController.text,
+              name: nameController.text,
+            ),
+          ),
+        );
   }
 
   @override
@@ -250,7 +274,7 @@ class _DetailPageState extends State<DetailPage> {
                 Container(
                   margin: const EdgeInsets.only(top: 5),
                   child: Text(
-                    '15 Hari lagi',
+                    '${widget.dataCampaign!.deadlines} Hari lagi',
                     style: primaryTextStyle.copyWith(
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
@@ -274,7 +298,8 @@ class _DetailPageState extends State<DetailPage> {
                   height: 5,
                   width: (MediaQuery.of(context).size.width -
                           (2 * defaultPadding)) *
-                      (50 / 100),
+                      (widget.dataCampaign!.totalDonate /
+                          widget.dataCampaign!.amountRequire),
                   margin: const EdgeInsets.only(top: 10),
                   decoration: BoxDecoration(
                     color: kPrimaryColor,
@@ -288,7 +313,7 @@ class _DetailPageState extends State<DetailPage> {
               children: [
                 itemInfo(
                   "Donasi",
-                  widget.dataCampaign!.campaignComments.length,
+                  widget.dataCampaign!.donateCampaign.length,
                   Icons.favorite_rounded,
                   kRedColor,
                 ),
@@ -808,9 +833,9 @@ class _DetailPageState extends State<DetailPage> {
             return true;
           },
           child: DraggableScrollableSheet(
-            initialChildSize: 0.78,
+            initialChildSize: 0.79,
             minChildSize: 0,
-            maxChildSize: 0.80,
+            maxChildSize: 0.79,
             shouldCloseOnMinExtent: false,
             builder: (context, scrollController) {
               return Container(
@@ -852,7 +877,8 @@ class _DetailPageState extends State<DetailPage> {
                                 item.value["emot"], item.key + 1, () {
                               setState(() {
                                 _selectedItem = item.key + 1;
-                                _nominalSelected = item.value["value"];
+                                _nominalSelected =
+                                    item.value["value"].toString();
                               });
                             });
                           }).toList()),
@@ -960,127 +986,98 @@ class _DetailPageState extends State<DetailPage> {
 
     return Scaffold(
       backgroundColor: kLightGreyColor,
-      body: Stack(
-        children: [
-          Container(
-            width: double.infinity,
-            height: 255 - heightScroll,
-            decoration: BoxDecoration(color: kWhitekColor),
-          ),
-          Container(
-            width: double.infinity,
-            height: 250 - heightScroll,
-            decoration: BoxDecoration(
-              color: kSecondaryColor,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(100),
+      body: BlocConsumer<CampaignCubit, CampaignState>(
+        listener: (context, state) {
+          if (state is CampaignILoading) {
+            const LoadingAnimation();
+          } else if (state is CampaignSuccess) {
+            Navigator.pushNamedAndRemoveUntil(
+                context, '/success', (contect) => false);
+          }
+        },
+        builder: (context, state) {
+          return Stack(
+            children: [
+              Container(
+                width: double.infinity,
+                height: 255 - heightScroll,
+                decoration: BoxDecoration(color: kWhitekColor),
               ),
-              image: widget.dataCampaign!.images.isNotEmpty
-                  ? DecorationImage(
-                      fit: BoxFit.cover,
-                      image: NetworkImage(
-                        widget.dataCampaign!.images.first.linkUrl,
-                      ),
-                    )
-                  : const DecorationImage(
-                      fit: BoxFit.cover,
-                      image: AssetImage('assets/icon_blank_picture.png'),
-                    ),
-            ),
-          ),
-          NotificationListener<ScrollNotification>(
-            onNotification: (notification) {
-              if (notification.metrics.pixels / 10 >= 0 &&
-                  notification.metrics.pixels / 10 <= 24) {
-                setState(() {
-                  heightScroll =
-                      (notification.metrics.pixels / 10).ceilToDouble() * 6;
-                });
-              } else {
-                setState(() {
-                  heightScroll = 250;
-                });
-              }
+              Container(
+                width: double.infinity,
+                height: 250 - heightScroll,
+                decoration: BoxDecoration(
+                  color: kSecondaryColor,
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(100),
+                  ),
+                  image: widget.dataCampaign!.images.isNotEmpty
+                      ? DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(
+                            widget.dataCampaign!.images.first.linkUrl,
+                          ),
+                        )
+                      : const DecorationImage(
+                          fit: BoxFit.cover,
+                          image: AssetImage('assets/icon_blank_picture.png'),
+                        ),
+                ),
+              ),
+              NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  if (notification.metrics.pixels / 10 >= 0 &&
+                      notification.metrics.pixels / 10 <= 24) {
+                    setState(() {
+                      heightScroll =
+                          (notification.metrics.pixels / 10).ceilToDouble() * 6;
+                    });
+                  } else {
+                    setState(() {
+                      heightScroll = 250;
+                    });
+                  }
 
-              if (notification.metrics.axis.name == "vertical" &&
-                  notification.metrics.pixels / 100 <= 1) {
-                setState(() {
-                  _scrollOffset = notification.metrics.pixels / 100;
-                  changeColor = kWhitekColor;
-                });
-              } else {
-                setState(() {
-                  changeColor = kBlackColor;
-                });
-              }
+                  if (notification.metrics.axis.name == "vertical" &&
+                      notification.metrics.pixels / 100 <= 1) {
+                    setState(() {
+                      _scrollOffset = notification.metrics.pixels / 100;
+                      changeColor = kWhitekColor;
+                    });
+                  } else {
+                    setState(() {
+                      changeColor = kBlackColor;
+                    });
+                  }
 
-              return true;
-            },
-            child: ListView(
-              padding: const EdgeInsets.only(top: 250),
-              children: [
-                titleSection(),
-                contentInfoSection(),
-                contentDetailSection(),
-                peoplsPrayersSection(),
-              ],
-            ),
-          ),
-          customAppBar(),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: CustomButton(
-              title: "Donasi sekarang",
-              onPressed: () {
-                setState(() {
-                  _isVisiblePayment = true;
-                });
-              },
-            ),
-          ),
-          if (_isVisiblePayment)
-            modalPayment(() {
-              print("WOK");
-              // Navigator.pushNamedAndRemoveUntil(
-              //     context, '/success', (context) => false);
-              print("@@@@@@@@@@@@@@@@@@@@@@");
-              print(widget.dataCampaign!.campaignName);
-              print(widget.dataCampaign!.slugName);
-              print(widget.dataCampaign!.amountRequire);
-              print(widget.dataCampaign!.description);
-              print(widget.dataCampaign!.organizer["id"]);
-              print(widget.dataCampaign!.id);
-              print(_nominalSelected);
-              print(_bankNameSelect);
-              print(_codeBankSelect);
-              print(nameController.text);
-              print(bankAccountNumberController.text);
-              print(commentController.text);
-              print(nameController.text);
-
-              // context.read<CampaignCubit>().createUserDonateCampaign(
-              //       DonateCampaignModel(
-              //         campaignName: widget.dataCampaign!.campaignName,
-              //         slugName: widget.dataCampaign!.slugName,
-              //         amount: widget.dataCampaign!.amountRequire,
-              //         nominal: _nominalSelected,
-              //         description: widget.dataCampaign!.description,
-              //         organizerId: widget.dataCampaign!.organizer["id"],
-              //         campaignId: widget.dataCampaign!.id,
-              //         bank: PostBankModel(
-              //           bankName: _bankNameSelect,
-              //           bankCode: _codeBankSelect,
-              //           accountName: nameController.text,
-              //           accountNumber: bankAccountNumberController.text,
-              //         ),
-              //         comment: CommentarModel(
-              //           comment: commentController.text,
-              //           name: nameController.text,
-              //         ),
-              //       ),
-              //     );
-            })
-        ],
+                  return true;
+                },
+                child: ListView(
+                  padding: const EdgeInsets.only(top: 250),
+                  children: [
+                    titleSection(),
+                    contentInfoSection(),
+                    contentDetailSection(),
+                    peoplsPrayersSection(),
+                  ],
+                ),
+              ),
+              customAppBar(),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: CustomButton(
+                  title: "Donasi sekarang",
+                  onPressed: () {
+                    setState(() {
+                      _isVisiblePayment = true;
+                    });
+                  },
+                ),
+              ),
+              if (_isVisiblePayment) modalPayment(_paymentDonate)
+            ],
+          );
+        },
       ),
     );
   }
