@@ -11,6 +11,8 @@ final class CampaignInitial extends CampaignState {}
 
 final class CampaignILoading extends CampaignState {}
 
+final class CampaignDonateCampaignSuccess extends CampaignState {}
+
 final class CampaignSuccess extends CampaignState {
   final List<dynamic> campaigns;
 

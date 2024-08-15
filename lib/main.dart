@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kitabantu/cubit/auth_cubit.dart';
+import 'package:kitabantu/cubit/banks_cubit.dart';
 import 'package:kitabantu/cubit/campaign_cubit.dart';
 import 'package:kitabantu/cubit/categories_cubit.dart';
 import 'package:kitabantu/cubit/page_cubit.dart';
@@ -55,6 +56,9 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => CampaignCubit(),
+          ),
+          BlocProvider(
+            create: (context) => BanksCubit(),
           ),
         ],
         child: MaterialApp(

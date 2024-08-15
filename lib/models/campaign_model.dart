@@ -1,3 +1,5 @@
+import 'package:kitabantu/models/bank_model.dart';
+
 class ImagesModel {
   final String? id;
   final String linkUrl;
@@ -15,25 +17,25 @@ class ImagesModel {
   }
 }
 
-class DonateCampaignModel {
-  final String id;
-  final String nominal;
-  final String date;
+// class DonateCampaignModel {
+//   final String id;
+//   final String nominal;
+//   final String date;
 
-  DonateCampaignModel({
-    required this.id,
-    required this.nominal,
-    required this.date,
-  });
+//   DonateCampaignModel({
+//     required this.id,
+//     required this.nominal,
+//     required this.date,
+//   });
 
-  factory DonateCampaignModel.fromJson(Map<String, dynamic> json) {
-    return DonateCampaignModel(
-      id: json['id'],
-      nominal: json['nominal'],
-      date: json['date'],
-    );
-  }
-}
+//   factory DonateCampaignModel.fromJson(Map<String, dynamic> json) {
+//     return DonateCampaignModel(
+//       id: json['id'],
+//       nominal: json['nominal'],
+//       date: json['date'],
+//     );
+//   }
+// }
 
 class CampaignCommentsModel {
   final String id;
@@ -109,5 +111,61 @@ class CampaignModel {
           .map((comment) => CampaignCommentsModel.fromJson(comment))
           .toList(),
     );
+  }
+}
+
+class CommentarModel {
+  final String name;
+  final String comment;
+
+  const CommentarModel({required this.comment, required this.name});
+
+  factory CommentarModel.fromJson(Map<String, dynamic> json) {
+    return CommentarModel(comment: json['comment'], name: json['name']);
+  }
+
+  Map<String, dynamic> toJSON() {
+    return {
+      "name": name,
+      "comment": comment,
+    };
+  }
+}
+
+class DonateCampaignModel {
+  final String campaignName;
+  final String slugName;
+  final int amount;
+  final int nominal;
+  final String description;
+  final String organizerId;
+  final String campaignId;
+  final PostBankModel bank;
+  final CommentarModel comment;
+
+  const DonateCampaignModel({
+    required this.campaignName,
+    required this.slugName,
+    required this.amount,
+    required this.nominal,
+    required this.description,
+    required this.organizerId,
+    required this.campaignId,
+    required this.bank,
+    required this.comment,
+  });
+
+  Map<String, dynamic> toJSON() {
+    return {
+      "campaign_name": campaignName,
+      "slug_name": slugName,
+      "amount": amount,
+      "nominal": nominal,
+      "description": description,
+      "organizer_id": organizerId,
+      "campaign_id": campaignId,
+      "bank": bank.toJSON(),
+      "comment": comment.toJSON()
+    };
   }
 }

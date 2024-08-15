@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:kitabantu/cubit/banks_cubit.dart';
+import 'package:kitabantu/cubit/campaign_cubit.dart';
+import 'package:kitabantu/models/bank_model.dart';
 import 'package:kitabantu/models/campaign_model.dart';
 import 'package:kitabantu/theme.dart';
 import 'package:kitabantu/widgets/custom_button.dart';
@@ -18,10 +22,26 @@ class _DetailPageState extends State<DetailPage> {
   double _scrollOffset = 0.2;
   bool _isVisiblePayment = false;
   int _selectedItem = 0;
+  int _selectedBank = -1;
+  int _nominalSelected = 0;
+  String _bankNameSelect = "";
+  String _codeBankSelect = "";
+  String _accountNameSelect = "";
+
   Color changeColor = kWhitekColor;
+  TextEditingController nameController = TextEditingController(text: "");
+  TextEditingController commentController = TextEditingController(text: "");
+  TextEditingController bankAccountNumberController =
+      TextEditingController(text: "");
   TextEditingController amountController = TextEditingController(text: "");
   DraggableScrollableController dragScrollController =
       DraggableScrollableController();
+
+  @override
+  void initState() {
+    context.read<BanksCubit>().fectBanks();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -410,7 +430,7 @@ class _DetailPageState extends State<DetailPage> {
                               height: 5,
                             ),
                             Text(
-                              '27 Maret 20234',
+                              widget.dataCampaign!.startDate.toString(),
                               style: greyTextStyle.copyWith(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -710,17 +730,19 @@ class _DetailPageState extends State<DetailPage> {
     Widget modalPayment(Function() onSubmit) {
       List itemSelected = [
         {"emot": "😘", "value": 1000},
+        {"emot": "😉", "value": 2000},
         {"emot": "🥰", "value": 5000},
         {"emot": "🥳", "value": 10000},
         {"emot": "🤩", "value": 50000},
+        {"emot": "😇", "value": 100000},
       ];
       Widget selectedItem(
           int amount, String emot, int index, Function() onSelect) {
         return GestureDetector(
           onTap: onSelect,
           child: Container(
-            height: 130,
-            width: 130,
+            height: 75,
+            width: 106,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
@@ -733,7 +755,7 @@ class _DetailPageState extends State<DetailPage> {
                 Text(
                   emot,
                   style: blackTextStyle.copyWith(
-                    fontSize: 35,
+                    fontSize: 30,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
@@ -741,11 +763,34 @@ class _DetailPageState extends State<DetailPage> {
                   NumberFormat.currency(symbol: "", decimalDigits: 0)
                       .format(amount),
                   style: blackTextStyle.copyWith(
-                    fontSize: 20,
+                    fontSize: 15,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
               ],
+            ),
+          ),
+        );
+      }
+
+      Widget textInput({controller, hint}) {
+        return Container(
+          margin: const EdgeInsets.only(top: 10),
+          child: TextFormField(
+            controller: controller,
+            cursorColor: kBlackColor,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.only(
+                right: 45,
+                left: 15,
+                top: 10,
+                bottom: 10,
+              ),
+              hintText: hint,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15),
+                borderSide: BorderSide(color: kLightGreyColor),
+              ),
             ),
           ),
         );
@@ -763,9 +808,9 @@ class _DetailPageState extends State<DetailPage> {
             return true;
           },
           child: DraggableScrollableSheet(
-            initialChildSize: 0.55,
+            initialChildSize: 0.78,
             minChildSize: 0,
-            maxChildSize: 0.55,
+            maxChildSize: 0.80,
             shouldCloseOnMinExtent: false,
             builder: (context, scrollController) {
               return Container(
@@ -800,16 +845,104 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                       ),
                       Wrap(
-                          spacing: 25,
-                          runSpacing: 25,
+                          spacing: 17,
+                          runSpacing: 17,
                           children: itemSelected.asMap().entries.map((item) {
                             return selectedItem(item.value["value"],
                                 item.value["emot"], item.key + 1, () {
                               setState(() {
                                 _selectedItem = item.key + 1;
+                                _nominalSelected = item.value["value"];
                               });
                             });
                           }).toList()),
+                      Container(
+                        margin: const EdgeInsets.only(top: 20),
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Payment method",
+                              style: blackTextStyle.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            BlocBuilder<BanksCubit, BanksState>(
+                              builder: (context, state) {
+                                if (state is BanksSuccess) {
+                                  return Wrap(
+                                    alignment: WrapAlignment.start,
+                                    runAlignment: WrapAlignment.end,
+                                    spacing: 15,
+                                    runSpacing: 15,
+                                    children:
+                                        state.banks.asMap().entries.map((bank) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedBank = bank.key;
+                                            _bankNameSelect = bank.value.name;
+                                            _codeBankSelect =
+                                                bank.value.bankCode;
+                                          });
+                                        },
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          width: 110,
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 10),
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 1.5,
+                                                color: _selectedBank == bank.key
+                                                    ? kPrimaryColor
+                                                    : kGreyColor),
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          child: Text(
+                                            bank.value.name,
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                                }
+                                return const Wrap(
+                                  spacing: 15,
+                                  runSpacing: 15,
+                                  children: [],
+                                );
+                              },
+                            ),
+                            textInput(
+                                controller: bankAccountNumberController,
+                                hint: 'Bank Account Number')
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: const EdgeInsets.only(top: 20),
+                        alignment: Alignment.centerLeft,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Payment method",
+                              style: blackTextStyle.copyWith(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            textInput(controller: nameController, hint: 'name'),
+                            textInput(
+                                controller: commentController, hint: 'comment')
+                          ],
+                        ),
+                      ),
                       CustomButton(
                         title: "Lanjutkan pembayaran",
                         margin: const EdgeInsets.only(top: 20),
@@ -846,7 +979,8 @@ class _DetailPageState extends State<DetailPage> {
                   ? DecorationImage(
                       fit: BoxFit.cover,
                       image: NetworkImage(
-                          '${widget.dataCampaign!.images.first.linkUrl}'),
+                        widget.dataCampaign!.images.first.linkUrl,
+                      ),
                     )
                   : const DecorationImage(
                       fit: BoxFit.cover,
@@ -906,8 +1040,45 @@ class _DetailPageState extends State<DetailPage> {
           ),
           if (_isVisiblePayment)
             modalPayment(() {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, '/success', (context) => false);
+              print("WOK");
+              // Navigator.pushNamedAndRemoveUntil(
+              //     context, '/success', (context) => false);
+              print("@@@@@@@@@@@@@@@@@@@@@@");
+              print(widget.dataCampaign!.campaignName);
+              print(widget.dataCampaign!.slugName);
+              print(widget.dataCampaign!.amountRequire);
+              print(widget.dataCampaign!.description);
+              print(widget.dataCampaign!.organizer["id"]);
+              print(widget.dataCampaign!.id);
+              print(_nominalSelected);
+              print(_bankNameSelect);
+              print(_codeBankSelect);
+              print(nameController.text);
+              print(bankAccountNumberController.text);
+              print(commentController.text);
+              print(nameController.text);
+
+              // context.read<CampaignCubit>().createUserDonateCampaign(
+              //       DonateCampaignModel(
+              //         campaignName: widget.dataCampaign!.campaignName,
+              //         slugName: widget.dataCampaign!.slugName,
+              //         amount: widget.dataCampaign!.amountRequire,
+              //         nominal: _nominalSelected,
+              //         description: widget.dataCampaign!.description,
+              //         organizerId: widget.dataCampaign!.organizer["id"],
+              //         campaignId: widget.dataCampaign!.id,
+              //         bank: PostBankModel(
+              //           bankName: _bankNameSelect,
+              //           bankCode: _codeBankSelect,
+              //           accountName: nameController.text,
+              //           accountNumber: bankAccountNumberController.text,
+              //         ),
+              //         comment: CommentarModel(
+              //           comment: commentController.text,
+              //           name: nameController.text,
+              //         ),
+              //       ),
+              //     );
             })
         ],
       ),
