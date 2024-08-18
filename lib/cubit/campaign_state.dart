@@ -13,11 +13,20 @@ final class CampaignILoading extends CampaignState {}
 
 final class CampaignSuccess extends CampaignState {
   final List<dynamic> campaigns;
+  final List<dynamic> campaignsCarousel;
+  final List<dynamic> filterCampaigns;
+  final List<dynamic> banner;
 
-  const CampaignSuccess(this.campaigns);
+  const CampaignSuccess({
+    required this.campaigns,
+    required this.campaignsCarousel,
+    required this.filterCampaigns,
+    required this.banner,
+  });
 
   @override
-  List<Object> get props => [campaigns];
+  List<Object> get props =>
+      [campaigns, campaignsCarousel, filterCampaigns, banner];
 }
 
 final class CampaignFailed extends CampaignState {

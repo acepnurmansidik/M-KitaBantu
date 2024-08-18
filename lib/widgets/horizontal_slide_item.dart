@@ -152,6 +152,7 @@ class _HorizontalSlideItemState extends State<HorizontalSlideItem> {
       width: double.infinity,
       height: 230,
       padding: const EdgeInsets.symmetric(vertical: 10),
+      margin: const EdgeInsets.only(top: 20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.bottomLeft,
@@ -164,7 +165,6 @@ class _HorizontalSlideItemState extends State<HorizontalSlideItem> {
           ],
         ),
       ),
-      margin: const EdgeInsets.only(top: 20),
       child: Stack(
         children: [
           widget.bgAnimateImg != ""

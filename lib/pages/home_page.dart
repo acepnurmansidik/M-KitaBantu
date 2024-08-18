@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kitabantu/cubit/campaign_cubit.dart';
 import 'package:kitabantu/cubit/categories_cubit.dart';
+import 'package:kitabantu/pages/detail_page.dart';
 import 'package:kitabantu/theme.dart';
 import 'package:kitabantu/widgets/horizontal_slide_item.dart';
 
@@ -15,6 +16,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int currentIndex = 0;
+  int currentIndexCategory = 0;
   CarouselController controller = CarouselController();
 
   @override
@@ -85,20 +87,7 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
-    Widget bannerSection(EdgeInsets margin, Function() onDirect) {
-      return GestureDetector(
-        onTap: onDirect,
-        child: Container(
-          height: 170,
-          width: double.infinity,
-          margin: const EdgeInsets.only(top: 30),
-          color: kSecondaryColor,
-        ),
-      );
-    }
-
-    Widget slideWithOptions(
-        EdgeInsets marginVer, Function() onPressed, Function() onDirect) {
+    Widget slideWithOptions(EdgeInsets marginVer) {
       List categories = [
         {"title": "Pendidikan", "icon": Icons.school},
         {"title": "Kemanusiaan", "icon": Icons.bloodtype},
@@ -110,15 +99,26 @@ class _HomePageState extends State<HomePage> {
         "Panti Asuhan": Icons.home,
         "Lingkungan": Icons.nature,
       };
+
       Widget itemSlide(
-          String title, IconData icon, EdgeInsets marginHorizontal) {
+        String title,
+        IconData icon,
+        int index,
+        EdgeInsets marginHorizontal,
+        Function() onSelectPressed,
+      ) {
         return Container(
           height: 40,
           margin: marginHorizontal,
           child: TextButton(
-            onPressed: onPressed,
+            onPressed: onSelectPressed,
             style: TextButton.styleFrom(
-                side: BorderSide(width: 1, color: kPrimaryColor)),
+              side: BorderSide(
+                width: 1,
+                color:
+                    index == currentIndexCategory ? kPrimaryColor : kGreyColor,
+              ),
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -160,6 +160,7 @@ class _HomePageState extends State<HomePage> {
                       return itemSlide(
                         category.value.title,
                         iconCategories[category.value.title],
+                        category.key,
                         EdgeInsets.only(
                             left: category.key == 0
                                 ? defaultPadding
@@ -167,14 +168,24 @@ class _HomePageState extends State<HomePage> {
                             right: category.key == state.categories.length - 1
                                 ? defaultPadding
                                 : 0),
+                        () {
+                          context
+                              .read<CampaignCubit>()
+                              .fetchFilterCampaigns(category.value.slugName);
+                          setState(() {
+                            currentIndexCategory = category.key;
+                          });
+                        },
                       );
                     }).toList());
                   }
+
                   return Row(
                     children: categories.asMap().entries.map((category) {
                       return itemSlide(
                         "           ",
                         Icons.dangerous_rounded,
+                        0,
                         EdgeInsets.only(
                             left: category.key == 0
                                 ? defaultPadding
@@ -182,6 +193,7 @@ class _HomePageState extends State<HomePage> {
                             right: category.key == categories.length - 1
                                 ? defaultPadding
                                 : 0),
+                        () {},
                       );
                     }).toList(),
                   );
@@ -192,11 +204,11 @@ class _HomePageState extends State<HomePage> {
               builder: (context, state) {
                 if (state is CampaignSuccess) {
                   return HorizontalSlideItem(
-                    campaigns: state.campaigns,
+                    campaigns: state.filterCampaigns,
                     bgAnimateImg: "",
                   );
                 }
-                return HorizontalSlideItem(
+                return const HorizontalSlideItem(
                   campaigns: [],
                   bgAnimateImg: "",
                 );
@@ -208,107 +220,105 @@ class _HomePageState extends State<HomePage> {
     }
 
     Widget carouselSection(EdgeInsets margin, Function() onDirect) {
-      List data = [
-        {
-          "title": "Disini kita",
-          "imgUrl": "",
-          "desc": "",
-          "totalDonate": "",
-          "currentDonate": "",
-          "comments": [
-            {
-              "userId": "",
-              "username": "",
-              "date": "",
-              "comment": "",
-            }
-          ],
-        },
-        {
-          "title": "Disana kamu",
-          "imgUrl": "",
-          "desc": "",
-          "totalDonate": "",
-          "currentDonate": "",
-          "comments": [
-            {
-              "userId": "",
-              "username": "",
-              "date": "",
-              "comment": "",
-            }
-          ],
-        },
-        {
-          "title": "Disini diriku",
-          "imgUrl": "",
-          "desc": "",
-          "totalDonate": "",
-          "currentDonate": "",
-          "comments": [
-            {
-              "userId": "",
-              "username": "",
-              "date": "",
-              "comment": "",
-            }
-          ],
-        },
-      ];
       return GestureDetector(
         onTap: onDirect,
         child: Container(
           width: double.infinity,
           margin: margin,
-          child: Stack(
-            children: [
-              CarouselSlider(
-                options: CarouselOptions(
-                  height: 150,
-                  viewportFraction: 1,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
-                ),
-                items: data.map((item) {
-                  return Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: kPrimaryColor,
-                    ),
-                    child: Text(item["title"]),
-                  );
-                }).toList(),
-              ),
-              Container(
-                alignment: Alignment.bottomLeft,
-                height: 150,
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: defaultPadding,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: data.asMap().entries.map((item) {
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      height: 7,
-                      width: currentIndex == item.key ? 15 : 7,
-                      margin: const EdgeInsets.only(left: 3),
-                      decoration: BoxDecoration(
-                        color: currentIndex == item.key
-                            ? kWhitekColor
-                            : kGreyColor,
-                        borderRadius: BorderRadius.circular(10),
+          child: BlocBuilder<CampaignCubit, CampaignState>(
+            builder: (context, state) {
+              if (state is CampaignSuccess) {
+                return Stack(
+                  children: [
+                    CarouselSlider(
+                      options: CarouselOptions(
+                        height: 180,
+                        viewportFraction: 1,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            currentIndex = index;
+                          });
+                        },
                       ),
-                    );
-                  }).toList(),
-                ),
-              )
-            ],
+                      items: state.campaignsCarousel.map((item) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    DetailPage(dataCampaign: item),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: NetworkImage(item.images.first.linkUrl),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    Container(
+                      alignment: Alignment.bottomLeft,
+                      height: 180,
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: defaultPadding,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children:
+                            state.campaignsCarousel.asMap().entries.map((item) {
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            height: 7,
+                            width: currentIndex == item.key ? 15 : 7,
+                            margin: const EdgeInsets.only(left: 3),
+                            decoration: BoxDecoration(
+                              color: currentIndex == item.key
+                                  ? kWhitekColor
+                                  : kSecondaryColor,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    )
+                  ],
+                );
+              }
+
+              return Stack(
+                children: [
+                  CarouselSlider(
+                      options: CarouselOptions(
+                        height: 180,
+                        viewportFraction: 1,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            currentIndex = index;
+                          });
+                        },
+                      ),
+                      items: const []),
+                  Container(
+                    alignment: Alignment.bottomLeft,
+                    height: 180,
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: defaultPadding,
+                    ),
+                  )
+                ],
+              );
+            },
           ),
         ),
       );
@@ -317,11 +327,40 @@ class _HomePageState extends State<HomePage> {
     return ListView(
       children: [
         profileSection(
-          const EdgeInsets.only(top: 30),
+          const EdgeInsets.only(top: 20),
         ),
-        bannerSection(const EdgeInsets.only(top: 30), () {}),
-        slideWithOptions(const EdgeInsets.only(top: 30), () {}, () {}),
-        carouselSection(const EdgeInsets.only(top: 30), () {}),
+        BlocBuilder<CampaignCubit, CampaignState>(
+          builder: (context, state) {
+            if (state is CampaignSuccess) {
+              return GestureDetector(
+                onTap: () {},
+                child: Container(
+                  height: 170,
+                  width: double.infinity,
+                  margin: const EdgeInsets.only(top: 20),
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image:
+                          NetworkImage(state.banner.first.images.first.linkUrl),
+                    ),
+                  ),
+                ),
+              );
+            }
+            return GestureDetector(
+              onTap: () {},
+              child: Container(
+                height: 170,
+                width: double.infinity,
+                margin: const EdgeInsets.only(top: 30),
+                color: kSecondaryColor,
+              ),
+            );
+          },
+        ),
+        slideWithOptions(const EdgeInsets.only(top: 20)),
+        carouselSection(const EdgeInsets.only(top: 20), () {}),
         BlocBuilder<CampaignCubit, CampaignState>(
           builder: (context, state) {
             if (state is CampaignSuccess) {
