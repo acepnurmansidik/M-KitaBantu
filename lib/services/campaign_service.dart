@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:kitabantu/models/campaign_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:kitabantu/services/auth_service.dart';
 
 class CampaignService {
   final String baseUrl = "http://10.0.2.2:3022/api/v1";
@@ -25,9 +26,11 @@ class CampaignService {
 
   Future<void> postDonateCampaign(DonateCampaignModel body) async {
     try {
+      final headers = await AuthService().authTokenHeaders("json");
       final response = await http.post(
         Uri.parse('$baseUrl/campaign/donate'),
         body: body.toJSON(),
+        headers: headers,
       );
 
       final data = json.decode(response.body);

@@ -65,6 +65,29 @@ class CampaignCommentsModel {
   }
 }
 
+class Organizer {
+  final String id;
+  final String name;
+  final bool verified;
+  final Map<String, dynamic> image;
+
+  Organizer({
+    required this.id,
+    required this.name,
+    required this.verified,
+    required this.image,
+  });
+
+  factory Organizer.fromJson(Map<String, dynamic> json) {
+    return Organizer(
+      id: json['id'],
+      name: json['name'],
+      verified: json['verified'],
+      image: json['image'],
+    );
+  }
+}
+
 class CampaignModel {
   final String id;
   final String campaignName;
@@ -76,7 +99,7 @@ class CampaignModel {
   final String endDate;
   final String deadlines;
   final Map<String, dynamic> category;
-  final Map<String, dynamic> organizer;
+  final Organizer organizer;
   final List<ImagesModel> images;
   final List<CampaignCommentsModel> campaignComments;
   final List<DonateCampaign> donateCampaign;
@@ -110,7 +133,7 @@ class CampaignModel {
       endDate: json['end_date'],
       deadlines: json['deadlines'],
       category: json['category'],
-      organizer: json['organizer'],
+      organizer: Organizer.fromJson(json['organizer']),
       images: (json['images'] as List<dynamic>)
           .map((image) => ImagesModel.fromJson(image))
           .toList(),

@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -51,7 +53,7 @@ class _DetailPageState extends State<DetailPage> {
             amount: widget.dataCampaign!.amountRequire.toString(),
             nominal: _nominalSelected,
             description: widget.dataCampaign!.description,
-            organizerId: widget.dataCampaign!.organizer["id"],
+            organizerId: widget.dataCampaign!.organizer.id,
             campaignId: widget.dataCampaign!.id,
             bank: PostBankModel(
               bankName: _bankNameSelect,
@@ -370,8 +372,18 @@ class _DetailPageState extends State<DetailPage> {
                         width: 60,
                         height: 60,
                         decoration: BoxDecoration(
-                          color: kSecondaryColor,
                           shape: BoxShape.circle,
+                          image: widget.dataCampaign!.organizer.image != null
+                              ? DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(
+                                    widget.dataCampaign!.organizer
+                                        .image["link_url"],
+                                  ),
+                                )
+                              : const DecorationImage(
+                                  image: AssetImage('assets/icon_group.png'),
+                                ),
                         ),
                       ),
                       const SizedBox(
@@ -380,13 +392,24 @@ class _DetailPageState extends State<DetailPage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            widget.dataCampaign!.organizer["name"],
-                            style: blackTextStyle.copyWith(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
+                          Row(children: [
+                            Text(
+                              widget.dataCampaign!.organizer.name,
+                              style: blackTextStyle.copyWith(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                              ),
                             ),
-                          ),
+                            Container(
+                              height: 17,
+                              width: 17,
+                              margin: const EdgeInsets.only(left: 5),
+                              decoration: const BoxDecoration(
+                                  image: DecorationImage(
+                                      image: AssetImage(
+                                          'assets/green_verified.png'))),
+                            )
+                          ]),
                           const SizedBox(
                             height: 3,
                           ),
@@ -771,8 +794,9 @@ class _DetailPageState extends State<DetailPage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                  width: 1.5,
-                  color: index == _selectedItem ? kPrimaryColor : kGreyColor),
+                width: index == _selectedItem ? 1.5 : 1,
+                color: index == _selectedItem ? kPrimaryColor : kGreyColor,
+              ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -833,15 +857,14 @@ class _DetailPageState extends State<DetailPage> {
             return true;
           },
           child: DraggableScrollableSheet(
-            initialChildSize: 0.79,
+            initialChildSize: 0.80,
             minChildSize: 0,
-            maxChildSize: 0.79,
+            maxChildSize: 0.80,
             shouldCloseOnMinExtent: false,
             builder: (context, scrollController) {
               return Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(
-                  horizontal: defaultPadding,
+                padding: const EdgeInsets.symmetric(
                   vertical: 10,
                 ),
                 decoration: BoxDecoration(
@@ -883,7 +906,11 @@ class _DetailPageState extends State<DetailPage> {
                             });
                           }).toList()),
                       Container(
-                        margin: const EdgeInsets.only(top: 20),
+                        margin: EdgeInsets.only(
+                          top: 20,
+                          left: defaultPadding,
+                          right: defaultPadding,
+                        ),
                         alignment: Alignment.centerLeft,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -922,10 +949,13 @@ class _DetailPageState extends State<DetailPage> {
                                           padding: const EdgeInsets.all(10),
                                           decoration: BoxDecoration(
                                             border: Border.all(
-                                                width: 1.5,
-                                                color: _selectedBank == bank.key
-                                                    ? kPrimaryColor
-                                                    : kGreyColor),
+                                              width: _selectedBank == bank.key
+                                                  ? 1.5
+                                                  : 1,
+                                              color: _selectedBank == bank.key
+                                                  ? kPrimaryColor
+                                                  : kGreyColor,
+                                            ),
                                             borderRadius:
                                                 BorderRadius.circular(10),
                                           ),
@@ -945,13 +975,18 @@ class _DetailPageState extends State<DetailPage> {
                               },
                             ),
                             textInput(
-                                controller: bankAccountNumberController,
-                                hint: 'Bank Account Number')
+                              controller: bankAccountNumberController,
+                              hint: 'Bank Account Number',
+                            )
                           ],
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(top: 20),
+                        margin: EdgeInsets.only(
+                          top: 20,
+                          left: defaultPadding,
+                          right: defaultPadding,
+                        ),
                         alignment: Alignment.centerLeft,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -965,13 +1000,15 @@ class _DetailPageState extends State<DetailPage> {
                             ),
                             textInput(controller: nameController, hint: 'name'),
                             textInput(
-                                controller: commentController, hint: 'comment')
+                              controller: commentController,
+                              hint: 'comment',
+                            )
                           ],
                         ),
                       ),
                       CustomButton(
                         title: "Lanjutkan pembayaran",
-                        margin: const EdgeInsets.only(top: 20),
+                        margin: const EdgeInsets.only(top: 25),
                         onPressed: onSubmit,
                       )
                     ],
@@ -1065,13 +1102,17 @@ class _DetailPageState extends State<DetailPage> {
               customAppBar(),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: CustomButton(
-                  title: "Donasi sekarang",
-                  onPressed: () {
-                    setState(() {
-                      _isVisiblePayment = true;
-                    });
-                  },
+                child: Container(
+                  color: kWhitekColor,
+                  child: CustomButton(
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    title: "Donasi sekarang",
+                    onPressed: () {
+                      setState(() {
+                        _isVisiblePayment = true;
+                      });
+                    },
+                  ),
                 ),
               ),
               if (_isVisiblePayment) modalPayment(_paymentDonate)

@@ -49,4 +49,22 @@ class AuthService {
           token: "", onboard: onboard.toString() != "" ? true : false);
     }
   }
+
+  Future<Map<String, String>> authTokenHeaders(String contentType) async {
+    String? tokeAvailable = await storage.read(key: 'token');
+    String typeheader;
+
+    switch (contentType) {
+      case 'json':
+        typeheader = 'application/x-www-form-urlencoded; charset=utf-8';
+        break;
+      default:
+        typeheader = 'multipart/form-data; charset=utf-8';
+    }
+
+    return <String, String>{
+      'Content-Type': typeheader,
+      'authorization': tokeAvailable!
+    };
+  }
 }

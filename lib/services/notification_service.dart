@@ -3,8 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:kitabantu/main.dart';
 import 'package:kitabantu/pages/detail_page.dart';
+import 'package:http/http.dart' as http;
+import 'package:kitabantu/services/auth_service.dart';
 
 class NotificationService {
+  final String baseUrl = "http://10.0.2.2:3022/api/v1";
+
   // FIREBASE ==================================================================
   // function to intialize notifications
   Future<void> initNotification() async {
@@ -38,10 +42,16 @@ class NotificationService {
       }
     });
 
-    FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) {
+    FirebaseMessaging.instance.onTokenRefresh.listen((fcmToken) async {
       // print(fcmToken);
       // Note: This callback is fired at each app startup and whenever a new
       // token is generated.
+      final headers = await AuthService().authTokenHeaders("json");
+      await http.put(
+        Uri.parse('$baseUrl/auth/on-refresh'),
+        body: {"device_token": fcmToken},
+        headers: headers,
+      );
     }).onError((err) {
       // Error getting token.
     });
