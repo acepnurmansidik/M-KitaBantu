@@ -206,11 +206,13 @@ class _HomePageState extends State<HomePage> {
                   return HorizontalSlideItem(
                     campaigns: state.filterCampaigns,
                     bgAnimateImg: "",
+                    margin: const EdgeInsets.only(top: 10),
                   );
                 }
                 return const HorizontalSlideItem(
                   campaigns: [],
                   bgAnimateImg: "",
+                  margin: EdgeInsets.only(top: 10),
                 );
               },
             ),
@@ -368,14 +370,48 @@ class _HomePageState extends State<HomePage> {
                 campaigns: state.campaigns,
                 startAtMargin: 150,
                 bgAnimateImg: "assets/img_prayer.png",
+                margin: const EdgeInsets.only(top: 25),
               );
             }
             return const HorizontalSlideItem(
               campaigns: [],
               startAtMargin: 150,
               bgAnimateImg: "assets/img_prayer.png",
+              margin: EdgeInsets.only(top: 10),
             );
           },
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 20, left: defaultPadding),
+              child: Text(
+                "Fast Help",
+                style: blackTextStyle.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            BlocBuilder<CampaignCubit, CampaignState>(
+              builder: (context, state) {
+                if (state is CampaignSuccess) {
+                  return HorizontalSlideItem(
+                    campaigns: state.campaignFastHelp,
+                    startAtMargin: 20,
+                    margin: const EdgeInsets.only(top: 10, bottom: 30),
+                  );
+                }
+                return const HorizontalSlideItem(
+                  campaigns: [],
+                  startAtMargin: 150,
+                  bgAnimateImg: "assets/img_prayer.png",
+                  margin: EdgeInsets.only(top: 10, bottom: 30),
+                );
+              },
+            ),
+          ],
         ),
       ],
     );

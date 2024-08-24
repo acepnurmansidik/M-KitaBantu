@@ -11,6 +11,7 @@ class HorizontalSlideItem extends StatefulWidget {
   final String title;
   final String bgAnimateImg;
   final double startAtMargin;
+  final EdgeInsets margin;
 
   const HorizontalSlideItem({
     super.key,
@@ -18,6 +19,7 @@ class HorizontalSlideItem extends StatefulWidget {
     this.title = "",
     this.bgAnimateImg = "",
     this.startAtMargin = 20,
+    this.margin = EdgeInsets.zero,
   });
 
   @override
@@ -152,7 +154,7 @@ class _HorizontalSlideItemState extends State<HorizontalSlideItem> {
       width: double.infinity,
       height: 230,
       padding: const EdgeInsets.symmetric(vertical: 10),
-      margin: const EdgeInsets.only(top: 20),
+      margin: widget.margin,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.bottomLeft,

@@ -14,17 +14,20 @@ class CampaignCubit extends Cubit<CampaignState> {
       emit(CampaignILoading());
       final campaigns = await CampaignService().getCampaigns();
       final banner = await CampaignService().getCampaigns();
-      final campaignsCarousel = await CampaignService().getCampaigns(limit: 3);
+      final campaignFastHelp = await CampaignService().getCampaigns();
+      final campaignsCarousel =
+          await CampaignService().getCampaigns(limit: 4, fastHelp: true);
 
       final categories = await CategoriesService().getCategories();
-      final filterCampaigns =
-          await CampaignService().getCampaigns(query: categories[0].slugName);
+      final filterCampaigns = await CampaignService()
+          .getCampaigns(category: categories[0].slugName);
 
       emit(CampaignSuccess(
           campaigns: campaigns,
           campaignsCarousel: campaignsCarousel,
           filterCampaigns: filterCampaigns,
-          banner: banner));
+          banner: banner,
+          campaignFastHelp: campaignFastHelp));
     } catch (e) {
       emit(CampaignFailed(e.toString()));
     }
@@ -41,6 +44,7 @@ class CampaignCubit extends Cubit<CampaignState> {
           campaigns: state.campaigns,
           campaignsCarousel: state.campaignsCarousel,
           filterCampaigns: state.filterCampaigns,
+          campaignFastHelp: state.campaignFastHelp,
           banner: state.banner,
         ));
       }
@@ -53,12 +57,13 @@ class CampaignCubit extends Cubit<CampaignState> {
     final state = this.state;
     try {
       final filterCampaigns =
-          await CampaignService().getCampaigns(query: setFilter);
+          await CampaignService().getCampaigns(category: setFilter);
 
       if (state is CampaignSuccess) {
         emit(CampaignSuccess(
           campaigns: state.campaigns,
           campaignsCarousel: state.campaignsCarousel,
+          campaignFastHelp: state.campaignFastHelp,
           filterCampaigns: filterCampaigns,
           banner: state.banner,
         ));
